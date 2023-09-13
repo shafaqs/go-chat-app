@@ -3,16 +3,13 @@ package handlers
 import (
 	"net/http"
 
+	"go-chat-app/server/models"
+
 	"github.com/gorilla/websocket"
 )
 
 var clients = make(map[*websocket.Conn]bool) // connected clients
-var broadcast = make(chan Message)           // broadcast channel
-
-type Message struct {
-	Username string `json:"username"`
-	Content  string `json:"content"`
-}
+var broadcast = make(chan models.Message)    // broadcast channel
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -31,7 +28,7 @@ func HandleWebSocketConnection(w http.ResponseWriter, r *http.Request) {
 	clients[ws] = true
 
 	for {
-		var msg Message
+		var msg models.Message
 		err := ws.ReadJSON(&msg)
 		if err != nil {
 			delete(clients, ws)
